@@ -3,9 +3,21 @@ package com.rbkmoney.provider.applepay.config;
 import com.rbkmoney.provider.applepay.service.SSLProvider;
 import com.rbkmoney.provider.applepay.service.SessionService;
 import com.rbkmoney.provider.applepay.store.APCertStore;
+import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by vpankrashkin on 10.04.18.
@@ -32,5 +44,39 @@ public class ApplicationConfig {
                                          @Value("${apple.read_timeout}") int readTimeoutMs,
                                          @Value("${apple.write_timeout}") int writeTimeoutMs) {
         return new SessionService(certStore, identityPass, connTimeoutMs, readTimeoutMs, writeTimeoutMs);
+    }
+
+    @Bean
+    public ServletWebServerFactory servletContainer(@Value("${server.http_port}") int httpPort) {
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+        Connector connector = new Connector();
+        connector.setPort(httpPort);
+        tomcat.addAdditionalTomcatConnectors(connector);
+        return tomcat;
+    }
+
+    @Bean
+    public FilterRegistrationBean externalPortRestrictingFilter(@Value("${server.http_port}") int httpPort, @Value("${server.http_path_prefix}/") String httpPathPrefix) {
+        Filter filter = new OncePerRequestFilter() {
+
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                            FilterChain filterChain) throws ServletException, IOException {
+                if (request.getLocalPort() == httpPort) {
+                    if (!request.getServletPath().startsWith(httpPathPrefix)) {
+                        response.sendError(404, "Unknown address");
+                        return;
+                    }
+                }
+                filterChain.doFilter(request, response);
+            }
+        };
+
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setFilter(filter);
+        filterRegistrationBean.setOrder(-100);
+        filterRegistrationBean.setName("httpPortFilter");
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
     }
 }

@@ -18,6 +18,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Store;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,8 +47,10 @@ public class SignatureValidator {
     }
 
     private final long expirationInMs;
+    private final byte[] appleRootCACert;
 
-    public SignatureValidator(long expirationInMs) {
+    public SignatureValidator(byte[] appleRootCACert, long expirationInMs) {
+        this.appleRootCACert = appleRootCACert;
         this.expirationInMs = expirationInMs;
     }
 
@@ -110,8 +113,8 @@ public class SignatureValidator {
         }
     }
 
-    private static InputStream getRootCA() {
-        return SignatureValidator.class.getClassLoader().getResourceAsStream(APPLE_ROOT_CA_G3_CER);
+    private InputStream getRootCA() {
+        return new ByteArrayInputStream(appleRootCACert);
     }
 
     private static boolean isECC(String type) {
