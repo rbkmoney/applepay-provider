@@ -1,7 +1,11 @@
 package com.rbkmoney.provider.applepay.config;
 
+import com.rbkmoney.damsel.payment_tool_provider.PaymentToolProviderSrv;
+import com.rbkmoney.provider.applepay.iface.decrypt.ProviderHandler;
+import com.rbkmoney.provider.applepay.service.DecryptionService;
 import com.rbkmoney.provider.applepay.service.SSLProvider;
 import com.rbkmoney.provider.applepay.service.SessionService;
+import com.rbkmoney.provider.applepay.service.SignatureValidator;
 import com.rbkmoney.provider.applepay.store.APCertStore;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +14,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.Filter;
@@ -18,6 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Created by vpankrashkin on 10.04.18.
@@ -47,6 +54,21 @@ public class ApplicationConfig {
     }
 
     @Bean
+    public SignatureValidator signatureValidator(@Value("${cert.ca.path}") Resource resource, @Value("${apple.expiration_time}") Long expirationTime) throws IOException {
+        return new SignatureValidator(Files.readAllBytes(resource.getFile().toPath()), expirationTime);
+    }
+
+    @Bean
+    public DecryptionService decryptionService(APCertStore apCertStore, @Value("${cert.key.pass}") char[] keyPass) {
+        return new DecryptionService(apCertStore, keyPass);
+    }
+
+    @Bean
+    public PaymentToolProviderSrv.Iface providerHandler(SignatureValidator validator, DecryptionService decryptionService) {
+       return new ProviderHandler(validator, decryptionService);
+    }
+
+    @Bean
     public ServletWebServerFactory servletContainer(@Value("${server.http_port}") int httpPort) {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
         Connector connector = new Connector();
@@ -56,7 +78,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public FilterRegistrationBean externalPortRestrictingFilter(@Value("${server.http_port}") int httpPort, @Value("${server.http_path_prefix}/") String httpPathPrefix) {
+    public FilterRegistrationBean externalPortRestrictingFilter(@Value("${server.http_port}") int httpPort, @Value("/${server.http_path_prefix}/") String httpPathPrefix) {
         Filter filter = new OncePerRequestFilter() {
 
             @Override

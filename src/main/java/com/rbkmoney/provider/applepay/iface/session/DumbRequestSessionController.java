@@ -1,8 +1,6 @@
 package com.rbkmoney.provider.applepay.iface.session;
 
-import com.rbkmoney.provider.applepay.service.APSessionException;
 import com.rbkmoney.provider.applepay.service.CertNotFoundException;
-import com.rbkmoney.provider.applepay.service.CryptoException;
 import com.rbkmoney.provider.applepay.service.SessionService;
 import com.rbkmoney.woody.api.flow.error.WErrorType;
 import com.rbkmoney.woody.api.flow.error.WRuntimeException;
@@ -21,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.WriteAbortedException;
-
 /**
  * Created by vpankrashkin on 04.04.18.
  */
@@ -30,7 +26,7 @@ import java.io.WriteAbortedException;
 @RestController
 @RequestMapping("/api/v1")
 @Api(description = "Session creation API")
-public class RequestSessionController {
+public class DumbRequestSessionController {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -38,18 +34,18 @@ public class RequestSessionController {
 
 
     @ApiOperation(value = "Request ApplePay session", notes = "")
-    @PostMapping(value = "/session", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/x-www-form-urlencoded")
+    @PostMapping(value = "/jssession", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/x-www-form-urlencoded")
     @ApiResponses(value = {
             @ApiResponse(code= 200, message = "Apple Pay session object"),
             @ApiResponse(code = 500, message = "Internal service error"),
             @ApiResponse(code = 503, message = "Apple Pay service unavailable")
     })
 
-    public ResponseEntity<String> getParty(@RequestParam String merchantId, @RequestParam String domainName, @RequestParam String displayName, @RequestParam String validationURL) {
-        log.info("Requested session for merchant: {}, name: {}, domain: {}, url: {}", merchantId, displayName, domainName, validationURL);
+    public ResponseEntity<String> getParty(@RequestParam String merchantId, @RequestParam String validationURL, @RequestParam String body) {
+        log.info("Requested session for merchant: {}, url: {}, body: {}", merchantId, validationURL, body);
 
         try {
-            return ResponseEntity.ok(service.requestSession(merchantId, domainName, displayName, validationURL));
+            return ResponseEntity.ok(service.requestSession(merchantId, validationURL, body));
         } catch (CertNotFoundException e) {
             log.error("Merchant not found: " + merchantId, e);
             return ResponseEntity.badRequest().body("Merchant not found");
