@@ -40,7 +40,13 @@ public class APCertStore {
             if (!Files.isRegularFile(certPath)) {
                 certPath = baseDir.resolve(buildCertFileName(null, certHash, suffix));
                 if (!Files.isRegularFile(certPath)) {
-                    return null;
+                    certPath = baseDir.resolve(buildCertFileName(merchantId, null, suffix));
+                    if (!Files.isRegularFile(certPath)) {
+                        certPath = baseDir.resolve(buildCertFileName(null, null, suffix));
+                        if (!Files.isRegularFile(certPath)) {
+                            return null;
+                        }
+                    }
                 }
             }
 

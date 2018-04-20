@@ -3,6 +3,7 @@ package com.rbkmoney.provider.applepay;
 import com.rbkmoney.damsel.payment_tool_provider.PaymentToolProviderSrv;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +17,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,50 +28,29 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
-                "cert.identity.path=./target/test-classes/apple_keys",
-                "cert.processing.path=/./target/test-classes/apple_keys"
+                "cert.identity.path=./target/test-classes/apple_keys/identity",
+                "cert.processing.path=./target/test-classes/apple_keys"
         }
 )
-public class AppRunner {
+@Ignore
+public class SessionRunnerTest {
 
-    @Value("http://127.0.0.1:${server.port}/provider/apple")
-    private String thriftUrl;
+
 
     @Value("http://127.0.0.1:${server.http_port}/${server.http_path_prefix}/jssession")
     private String sessionUrl;
 
 
-    PaymentToolProviderSrv.Iface client;
-    RestTemplate restTemplate;
-
-    @Before
-    public void setUp() throws URISyntaxException {
-        client = new THSpawnClientBuilder()
-                .withNetworkTimeout(0)
-                .withAddress(new URI(thriftUrl))
-                .build(PaymentToolProviderSrv.Iface.class);
-        restTemplate = new RestTemplate();
-    }
+    RestTemplate restTemplate = new RestTemplate();
 
     @Test
-    public void test() throws InterruptedException, URISyntaxException {
+    public void testRequestSession() throws InterruptedException, URISyntaxException {
         try {
-            /*HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            HttpEntity<Map<String, String>> request = new HttpEntity<>(new HashMap() {{
-                put("merchantId", "merchant.money.rbk.checkout");
-                put("domainName", "applefags.rbkmoney.com");
-                put("displayName", "RBKmoney Checkout");
-                put("validationURL", "https://apple-pay-gateway.apple.com/paymentservices/startSession");
-            }}, headers);
-            ResponseEntity<String> response = restTemplate.exchange(sessionUrl, HttpMethod.POST, request, String.class);
-
-*/
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
             MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-            map.add("merchantId", "merchant.money.rbk.checkout");
+            map.add("merchantId", "_");
             map.add("validationURL", "https://apple-pay-gateway.apple.com/paymentservices/startSession");
             map.add("body", "{\n" +
                     "    \"epochTimestamp\": 1524066498584,\n" +
@@ -88,7 +66,14 @@ public class AppRunner {
 
             ResponseEntity<String> response = restTemplate.postForEntity( sessionUrl, request , String.class );
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            System.out.println(response.getBody());
+            System.out.println("Response:"+response.getBody());
+
+            map.remove("merchantId");
+            map.add("merchantId", "merchant.money.rbk.checkout");
+
+            response = restTemplate.postForEntity( sessionUrl, request , String.class );
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            System.out.println("Response:"+response.getBody());
         } catch (HttpClientErrorException e) {
             System.out.println(e.getResponseBodyAsString());
             throw e;

@@ -1,10 +1,12 @@
 package com.rbkmoney.provider.applepay.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
  * Created by vpankrashkin on 29.03.18.
  */
+@JsonRootName("token")
 public class PaymentToken {
     @JsonProperty(value = "paymentData", required = true)
     private PaymentData paymentData;

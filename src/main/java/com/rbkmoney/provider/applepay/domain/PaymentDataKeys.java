@@ -1,9 +1,6 @@
 package com.rbkmoney.provider.applepay.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 
 import java.time.LocalDate;
 
@@ -30,14 +27,10 @@ public class PaymentDataKeys {
     @JsonProperty(value = "deviceManufacturerIdentifier", required = true)
     private String devManufacturerIdentifier;
 
-    @JsonTypeInfo(
-            use = JsonTypeInfo.Id.NAME,
-            include = JsonTypeInfo.As.PROPERTY,
-            property = "paymentDataType")
-    @JsonSubTypes({
-            @JsonSubTypes.Type(value = Auth3DS.class, name = "3DSecure"),
-            @JsonSubTypes.Type(value = AuthEMV.class, name = "EMV")
-    })
+    @JsonProperty("paymentDataType")
+    private AuthType authType;
+
+    @JsonProperty(value = "paymentData", required = true)
     private AuthData authData;
 
     public String getAppPrimaryAccountNumber() {
@@ -88,6 +81,14 @@ public class PaymentDataKeys {
         this.devManufacturerIdentifier = devManufacturerIdentifier;
     }
 
+    public AuthType getAuthType() {
+        return authType;
+    }
+
+    public void setAuthType(AuthType authType) {
+        this.authType = authType;
+    }
+
     public AuthData getAuthData() {
         return authData;
     }
@@ -99,12 +100,13 @@ public class PaymentDataKeys {
     @Override
     public String toString() {
         return "PaymentDataKeys{" +
-                "appPrimaryAccountNumber='" + appPrimaryAccountNumber + '\'' +
-                ", appExpirationDate=" + appExpirationDate +
+                "appPrimaryAccountNumber='" + (appPrimaryAccountNumber != null ? "***" : null) + '\'' +
+                ", appExpirationDate=" + (appExpirationDate != null ? "***" : null) +
                 ", currencyCode='" + currencyCode + '\'' +
                 ", transactionAmount=" + transactionAmount +
                 ", cardholderName='" + cardholderName + '\'' +
                 ", devManufacturerIdentifier='" + devManufacturerIdentifier + '\'' +
+                ", authType=" + authType +
                 ", authData=" + authData +
                 '}';
     }

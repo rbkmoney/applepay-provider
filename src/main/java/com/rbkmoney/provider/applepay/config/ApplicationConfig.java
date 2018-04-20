@@ -64,8 +64,8 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public PaymentToolProviderSrv.Iface providerHandler(SignatureValidator validator, DecryptionService decryptionService) {
-       return new ProviderHandler(validator, decryptionService);
+    public PaymentToolProviderSrv.Iface providerHandler(SignatureValidator validator, DecryptionService decryptionService, @Value("${apple.validation}") Boolean validation) {
+       return new ProviderHandler(validator, decryptionService, validation);
     }
 
     @Bean
