@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
                 "cert.processing.path=./target/test-classes/apple_keys"
         }
 )
-
+@Ignore
 public class SessionRunnerTest {
 
 
