@@ -1,5 +1,6 @@
 package com.rbkmoney.provider.applepay.service;
 
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.KDFParameters;
@@ -16,6 +17,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.Base64;
 import java.util.Enumeration;
 
 public class DecryptionTool {
@@ -56,6 +58,18 @@ public class DecryptionTool {
         // decrypt per Apple Pay spec
         final byte[] plaintext = decrypt(tokenData, merchantPrivateKey, ephemeralPublicKey, merchantIdentifier);
         return new String(plaintext, "ASCII");
+    }
+
+    /**
+     * @return same value, as contained in publicKeyHash field
+     * */
+    public static String pubKeyHashBase64(X509Certificate merchCer) throws NoSuchAlgorithmException {
+        return Base64.getEncoder().encodeToString(pubKeyHashBytes(merchCer));
+    }
+
+    public static byte[] pubKeyHashBytes(X509Certificate merchCer) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        return digest.digest(merchCer.getPublicKey().getEncoded());
     }
 
 

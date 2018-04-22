@@ -32,12 +32,12 @@ import static org.junit.Assert.assertEquals;
                 "cert.processing.path=./target/test-classes/apple_keys"
         }
 )
-@Ignore
+
 public class SessionRunnerTest {
 
 
 
-    @Value("http://127.0.0.1:${server.http_port}/${server.http_path_prefix}/jssession")
+    @Value("http://127.0.0.1:${server.rest_port}/${server.rest_path_prefix}/jssession")
     private String sessionUrl;
 
 

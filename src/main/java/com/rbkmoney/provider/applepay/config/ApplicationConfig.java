@@ -7,6 +7,7 @@ import com.rbkmoney.provider.applepay.service.SSLProvider;
 import com.rbkmoney.provider.applepay.service.SessionService;
 import com.rbkmoney.provider.applepay.service.SignatureValidator;
 import com.rbkmoney.provider.applepay.store.APCertStore;
+import com.rbkmoney.woody.api.flow.WFlow;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -69,7 +70,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ServletWebServerFactory servletContainer(@Value("${server.http_port}") int httpPort) {
+    public ServletWebServerFactory servletContainer(@Value("${server.rest_port}") int httpPort) {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
         Connector connector = new Connector();
         connector.setPort(httpPort);
@@ -78,13 +79,13 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public FilterRegistrationBean externalPortRestrictingFilter(@Value("${server.http_port}") int httpPort, @Value("/${server.http_path_prefix}/") String httpPathPrefix) {
+    public FilterRegistrationBean externalPortRestrictingFilter(@Value("${server.rest_port}") int restPort, @Value("/${server.rest_path_prefix}/") String httpPathPrefix) {
         Filter filter = new OncePerRequestFilter() {
 
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain filterChain) throws ServletException, IOException {
-                if (request.getLocalPort() == httpPort) {
+                if (request.getLocalPort() == restPort) {
                     if (!request.getServletPath().startsWith(httpPathPrefix)) {
                         response.sendError(404, "Unknown address");
                         return;
@@ -99,6 +100,42 @@ public class ApplicationConfig {
         filterRegistrationBean.setOrder(-100);
         filterRegistrationBean.setName("httpPortFilter");
         filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean woodyFilter(@Value("${server.rest_port}") int restPort, @Value("/${server.rest_path_prefix}/") String httpPathPrefix) {
+        WFlow wFlow = new WFlow();
+        Filter filter = new OncePerRequestFilter() {
+
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                            FilterChain filterChain) throws ServletException, IOException {
+                if (request.getLocalPort() == restPort) {
+                    if (request.getServletPath().startsWith(httpPathPrefix)) {
+                        wFlow.createServiceFork(() -> {
+                            try {
+                                filterChain.doFilter(request, response);
+                                return;
+                            } catch (IOException | ServletException e) {
+                                sneakyThrow(e);
+                            }
+                        }).run();
+                    }
+                }
+                filterChain.doFilter(request, response);
+            }
+
+            private <E extends Throwable, T> T sneakyThrow(Throwable t) throws E {
+                throw (E) t;
+            }
+        };
+
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setFilter(filter);
+        filterRegistrationBean.setOrder(-50);
+        filterRegistrationBean.setName("woodyFilter");
+        filterRegistrationBean.addUrlPatterns(httpPathPrefix+"*");
         return filterRegistrationBean;
     }
 }

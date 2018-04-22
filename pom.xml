@@ -17,7 +17,7 @@
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
         <server.port>8022</server.port>
-        <server.http_port>8080</server.http_port>
+        <server.rest_port>8080</server.rest_port>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dockerfile.base.service.tag>60ec6caf5c52778c9e89075656cca2ceeee4d0dd</dockerfile.base.service.tag>
         <damsel.version>1.234-15c5e61-epic</damsel.version>

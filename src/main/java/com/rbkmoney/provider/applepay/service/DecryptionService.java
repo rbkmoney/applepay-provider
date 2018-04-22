@@ -2,6 +2,7 @@ package com.rbkmoney.provider.applepay.service;
 
 import com.rbkmoney.provider.applepay.domain.PaymentToken;
 import com.rbkmoney.provider.applepay.store.APCertStore;
+import org.apache.commons.codec.binary.Hex;
 
 import java.util.Base64;
 
@@ -18,9 +19,11 @@ public class DecryptionService {
     }
 
     public String decryptToken(String merchantId, PaymentToken paymentToken) throws CryptoException, CertNotFoundException {
-        String keyHash = paymentToken.getPaymentData().getHeader().getPublicKeyHash().substring(0, 8);
+        String keyHash = Hex.encodeHexString(
+                Base64.getDecoder().decode(paymentToken.getPaymentData().getHeader().getPublicKeyHash())
+        ).substring(0, 7);
         byte[] merchCertData = certStore.getProcessingCert(merchantId, keyHash);
-        byte[] pkcs12KeyData = certStore.getProcessingKeyCert(merchantId, merchantId);
+        byte[] pkcs12KeyData = certStore.getProcessingKeyCert(merchantId, keyHash);
 
         if (merchCertData == null || pkcs12KeyData == null) {
             throw new CertNotFoundException("One or more keys're not found for merchant: "+merchantId);

@@ -50,5 +50,7 @@ public class SignatureValidatorTest {
         auth3DS.setEci("7");
         dataKeys.setAuthData(auth3DS);
         System.out.println(new ObjectMapper().writerFor(PaymentDataKeys.class).writeValueAsString(dataKeys));
+
+
     }
 }
