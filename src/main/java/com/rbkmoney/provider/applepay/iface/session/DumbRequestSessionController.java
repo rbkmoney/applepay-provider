@@ -34,14 +34,14 @@ public class DumbRequestSessionController {
 
 
     @ApiOperation(value = "Request ApplePay session", notes = "")
-    @PostMapping(value = "/jssession", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/x-www-form-urlencoded")
+    @PostMapping(value = "/session", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/x-www-form-urlencoded")
     @ApiResponses(value = {
             @ApiResponse(code= 200, message = "Apple Pay session object"),
             @ApiResponse(code = 500, message = "Internal service error"),
             @ApiResponse(code = 503, message = "Apple Pay service unavailable")
     })
 
-    public ResponseEntity<String> getParty(@RequestParam String merchantId, @RequestParam String validationURL, @RequestParam String body) {
+    public ResponseEntity<String> getSession(@RequestParam String merchantId, @RequestParam String validationURL, @RequestParam String body) {
         log.info("Requested session for merchant: {}, url: {}, body: {}", merchantId, validationURL, body);
 
         try {
@@ -64,9 +64,5 @@ public class DumbRequestSessionController {
         }
 
     }
-
-
-
-
 
 }

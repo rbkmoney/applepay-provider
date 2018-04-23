@@ -37,7 +37,7 @@ public class SessionRunnerTest {
 
 
 
-    @Value("http://127.0.0.1:${server.rest_port}/${server.rest_path_prefix}/jssession")
+    @Value("http://127.0.0.1:${server.rest_port}/${server.rest_path_prefix}/session")
     private String sessionUrl;
 
 
@@ -66,14 +66,14 @@ public class SessionRunnerTest {
 
             ResponseEntity<String> response = restTemplate.postForEntity( sessionUrl, request , String.class );
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            System.out.println("Response:"+response.getBody());
+            //System.out.println("Response:"+response.getBody());
 
             map.remove("merchantId");
             map.add("merchantId", "merchant.money.rbk.checkout");
 
             response = restTemplate.postForEntity( sessionUrl, request , String.class );
             assertEquals(HttpStatus.OK, response.getStatusCode());
-            System.out.println("Response:"+response.getBody());
+            //System.out.println("Response:"+response.getBody());
         } catch (HttpClientErrorException e) {
             System.out.println(e.getResponseBodyAsString());
             throw e;

@@ -16,6 +16,7 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.Filter;
@@ -137,5 +138,19 @@ public class ApplicationConfig {
         filterRegistrationBean.setName("woodyFilter");
         filterRegistrationBean.addUrlPatterns(httpPathPrefix+"*");
         return filterRegistrationBean;
+    }
+
+    //@Bean
+    public CommonsRequestLoggingFilter logFilter() {
+        CommonsRequestLoggingFilter filter
+                = new CommonsRequestLoggingFilter() {
+            @Override
+            protected void beforeRequest(HttpServletRequest request, String message) { }
+        };
+        filter.setIncludePayload(true);
+        filter.setMaxPayloadLength(10000);
+        filter.setAfterMessagePrefix("REQUEST DATA:[");
+
+        return filter;
     }
 }
