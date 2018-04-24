@@ -3,7 +3,6 @@ package com.rbkmoney.provider.applepay.config;
 import com.rbkmoney.damsel.payment_tool_provider.PaymentToolProviderSrv;
 import com.rbkmoney.provider.applepay.iface.decrypt.ProviderHandler;
 import com.rbkmoney.provider.applepay.service.DecryptionService;
-import com.rbkmoney.provider.applepay.service.SSLProvider;
 import com.rbkmoney.provider.applepay.service.SessionService;
 import com.rbkmoney.provider.applepay.service.SignatureValidator;
 import com.rbkmoney.provider.applepay.store.APCertStore;
@@ -26,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * Created by vpankrashkin on 10.04.18.
@@ -61,7 +59,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public DecryptionService decryptionService(APCertStore apCertStore, @Value("${cert.key.pass}") char[] keyPass) {
+    public DecryptionService decryptionService(APCertStore apCertStore, @Value("${cert.processing.pass}") char[] keyPass) {
         return new DecryptionService(apCertStore, keyPass);
     }
 
@@ -87,7 +85,7 @@ public class ApplicationConfig {
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain filterChain) throws ServletException, IOException {
                 if (request.getLocalPort() == restPort) {
-                    if (!request.getServletPath().startsWith(httpPathPrefix)) {
+                    if (!(request.getServletPath().startsWith(httpPathPrefix) || request.getServletPath().startsWith("/actuator/health"))) {
                         response.sendError(404, "Unknown address");
                         return;
                     }

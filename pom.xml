@@ -18,10 +18,11 @@
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
         <server.port>8022</server.port>
         <server.rest_port>8080</server.rest_port>
+        <exposed.ports>${server.port} ${server.rest_port}</exposed.ports>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dockerfile.base.service.tag>22c57470c4fc47161894f036b7cf9d70f42b75f5</dockerfile.base.service.tag>
         <damsel.version>1.234-15c5e61-epic</damsel.version>
-        <shared.resources.version>0.3.0</shared.resources.version>
+        <shared.resources.version>0.3.1</shared.resources.version>
     </properties>
 
     <dependencies>
