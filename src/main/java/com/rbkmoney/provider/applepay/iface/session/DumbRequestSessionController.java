@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by vpankrashkin on 04.04.18.
@@ -40,6 +37,7 @@ public class DumbRequestSessionController {
             @ApiResponse(code = 500, message = "Internal service error"),
             @ApiResponse(code = 503, message = "Apple Pay service unavailable")
     })
+    @CrossOrigin
 
     public ResponseEntity<String> getSession(@RequestParam String merchantId, @RequestParam String validationURL, @RequestParam String body) {
         log.info("Requested session for merchant: {}, url: {}, body: {}", merchantId, validationURL, body);
