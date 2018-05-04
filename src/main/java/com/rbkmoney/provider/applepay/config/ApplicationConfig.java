@@ -115,11 +115,11 @@ public class ApplicationConfig {
                         wFlow.createServiceFork(() -> {
                             try {
                                 filterChain.doFilter(request, response);
-                                return;
                             } catch (IOException | ServletException e) {
                                 sneakyThrow(e);
                             }
                         }).run();
+                        return;
                     }
                 }
                 filterChain.doFilter(request, response);

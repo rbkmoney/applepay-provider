@@ -12,7 +12,7 @@
 
     <groupId>com.rbkmoney.provider</groupId>
     <artifactId>applepay</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
