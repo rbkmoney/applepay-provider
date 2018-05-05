@@ -1,5 +1,8 @@
 package com.rbkmoney.provider.applepay.iface.session;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.rbkmoney.provider.applepay.domain.SessionRequest;
 import com.rbkmoney.provider.applepay.service.CertNotFoundException;
 import com.rbkmoney.provider.applepay.service.SessionService;
 import com.rbkmoney.woody.api.flow.error.WErrorType;
@@ -29,9 +32,11 @@ public class DumbRequestSessionController {
     @Autowired
     private SessionService service;
 
+    private ObjectWriter writer = new ObjectMapper().writer();
+
 
     @ApiOperation(value = "Request ApplePay session", notes = "")
-    @PostMapping(value = "/session", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/x-www-form-urlencoded")
+    @PostMapping(value = "/session", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/json")
     @ApiResponses(value = {
             @ApiResponse(code= 200, message = "Apple Pay session object"),
             @ApiResponse(code = 500, message = "Internal service error"),
@@ -39,13 +44,13 @@ public class DumbRequestSessionController {
     })
     @CrossOrigin
 
-    public ResponseEntity<String> getSession(@RequestParam String merchantId, @RequestParam String validationURL, @RequestParam String body) {
-        log.info("Requested session for merchant: {}, url: {}, body: {}", merchantId, validationURL, body);
+    public ResponseEntity<String> getSession(@RequestBody SessionRequest request) {
+        log.info("New Session request: {}", request);
 
         try {
-            return ResponseEntity.ok(service.requestSession(merchantId, validationURL, body));
+            return ResponseEntity.ok(service.requestSession(request.getMerchantId(), request.getValidationURL(), writer.writeValueAsString(request.getBody())));
         } catch (CertNotFoundException e) {
-            log.error("Merchant not found: " + merchantId, e);
+            log.error("Merchant not found: " + request.getMerchantId(), e);
             return ResponseEntity.badRequest().body("Merchant not found");
         } catch (WRuntimeException e) {
             WErrorType errorType = e.getErrorDefinition().getErrorType();
