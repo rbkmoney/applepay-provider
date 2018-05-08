@@ -12,7 +12,7 @@
 
     <groupId>com.rbkmoney.provider</groupId>
     <artifactId>applepay</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <properties>
         <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
@@ -21,7 +21,7 @@
         <exposed.ports>${server.port} ${server.rest_port}</exposed.ports>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dockerfile.base.service.tag>22c57470c4fc47161894f036b7cf9d70f42b75f5</dockerfile.base.service.tag>
-        <damsel.version>1.234-15c5e61-epic</damsel.version>
+        <damsel.version>1.232-5e54b26</damsel.version>
         <shared.resources.version>0.3.1</shared.resources.version>
     </properties>
 
