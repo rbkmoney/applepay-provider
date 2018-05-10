@@ -1,5 +1,6 @@
 package com.rbkmoney.provider.applepay.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -8,14 +9,22 @@ import com.fasterxml.jackson.annotation.JsonRootName;
  */
 @JsonRootName("token")
 public class PaymentToken {
-    @JsonProperty(value = "paymentData", required = true)
     private PaymentData paymentData;
-
-    @JsonProperty(value = "paymentMethod", required = true)
     private PaymentMethod paymentMethod;
-
-    @JsonProperty(value = "transactionIdentifier", required = true)
     private String transactionId;
+
+    @JsonCreator
+    public PaymentToken(
+            @JsonProperty(value = "paymentData", required = true) PaymentData paymentData,
+            @JsonProperty(value = "paymentMethod", required = true) PaymentMethod paymentMethod,
+            @JsonProperty(value = "transactionIdentifier", required = true) String transactionId) {
+        this.paymentData = paymentData;
+        this.paymentMethod = paymentMethod;
+        this.transactionId = transactionId;
+    }
+
+    public PaymentToken() {
+    }
 
     public PaymentData getPaymentData() {
         return paymentData;

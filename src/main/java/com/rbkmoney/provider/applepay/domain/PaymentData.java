@@ -1,23 +1,28 @@
 package com.rbkmoney.provider.applepay.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Created by vpankrashkin on 29.03.18.
  */
 public class PaymentData {
-
-    @JsonProperty(value = "version")
     private String version;
-
-    @JsonProperty(value = "data")
     private String data;
-
-    @JsonProperty(value = "signature")
     private String signature;
-
-    @JsonProperty(value = "header")
     private PaymentHeader header;
+
+    @JsonCreator
+    public PaymentData(
+            @JsonProperty(value = "version", required = true) String version,
+            @JsonProperty(value = "data", required = true) String data,
+            @JsonProperty(value = "signature", required = true) String signature,
+            @JsonProperty(value = "header", required = true) PaymentHeader header) {
+        this.version = version;
+        this.data = data;
+        this.signature = signature;
+        this.header = header;
+    }
 
     public String getVersion() {
         return version;

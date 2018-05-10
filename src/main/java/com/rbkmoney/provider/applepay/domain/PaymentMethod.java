@@ -1,22 +1,31 @@
 package com.rbkmoney.provider.applepay.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Created by vpankrashkin on 29.03.18.
  */
 public class PaymentMethod {
-    @JsonProperty(value = "displayName")
     private String displayName;
-
-    @JsonProperty(value = "network")
     private String paymentNetwork;
-
-    @JsonProperty(value = "type", required = true)
     private String paymentMethodType;
-
-    @JsonProperty(value = "paymentPass", required = true)
     private String paymentPass;
+
+    @JsonCreator
+    public PaymentMethod(
+            @JsonProperty(value = "displayName") String displayName,
+            @JsonProperty(value = "network") String paymentNetwork,
+            @JsonProperty(value = "type", required = true) String paymentMethodType,
+            @JsonProperty(value = "paymentPass") String paymentPass) {
+        this.displayName = displayName;
+        this.paymentNetwork = paymentNetwork;
+        this.paymentMethodType = paymentMethodType;
+        this.paymentPass = paymentPass;
+    }
+
+    public PaymentMethod() {
+    }
 
     public String getDisplayName() {
         return displayName;

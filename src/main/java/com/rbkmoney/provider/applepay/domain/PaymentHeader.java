@@ -1,24 +1,32 @@
 package com.rbkmoney.provider.applepay.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PaymentHeader {
-
-    @JsonProperty(value = "applicationData")
     private String applicationData;
-
-    @JsonProperty(value = "ephemeralPublicKey")
     private String ephemeralPublicKey;
-
-    @JsonProperty(value = "wrapppedKey")
     private String wrappedKey;
-
-    @JsonProperty(value = "publicKeyHash", required = true)
     private String publicKeyHash;
-
-    @JsonProperty(value = "transactionId", required = true)
     private String transactionId;
+
+    @JsonCreator
+    public PaymentHeader(
+            @JsonProperty(value = "applicationData") String applicationData,
+            @JsonProperty(value = "ephemeralPublicKey") String ephemeralPublicKey, //EC_v1 only
+            @JsonProperty(value = "wrapppedKey") String wrappedKey, //RSA_v1 only
+            @JsonProperty(value = "publicKeyHash", required = true) String publicKeyHash,
+            @JsonProperty(value = "transactionId", required = true)String transactionId) {
+        this.applicationData = applicationData;
+        this.ephemeralPublicKey = ephemeralPublicKey;
+        this.wrappedKey = wrappedKey;
+        this.publicKeyHash = publicKeyHash;
+        this.transactionId = transactionId;
+    }
+
+    public PaymentHeader() {
+    }
 
     public String getApplicationData() {
         return applicationData;

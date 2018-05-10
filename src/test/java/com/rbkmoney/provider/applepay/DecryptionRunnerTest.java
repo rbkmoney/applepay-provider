@@ -1,6 +1,7 @@
 package com.rbkmoney.provider.applepay;
 
 import com.rbkmoney.damsel.base.Content;
+import com.rbkmoney.damsel.base.InvalidRequest;
 import com.rbkmoney.damsel.payment_tool_provider.*;
 import com.rbkmoney.provider.applepay.service.DecryptionTool;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
@@ -54,12 +55,18 @@ public class DecryptionRunnerTest {
     public void testDecryption() throws IOException, TException {
         byte[] paymentToken = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("tinkoff.json"));
 
-
         ApplePayRequest payRequest = new ApplePayRequest("merchant.money.rbk.checkout", new Content("application/json", ByteBuffer.wrap(paymentToken
                 )));
         WrappedPaymentTool wrapped = new WrappedPaymentTool(PaymentRequest.apple(payRequest));
         UnwrappedPaymentTool unwrapped = client.unwrap(wrapped);
-        System.out.println(unwrapped);
+    }
 
+    @Test(expected = InvalidRequest.class)
+    public void testMissingFields() throws TException {
+        byte[] paymentToken = "{\"token\":{\"paymentMethod\":{\"displayName\":\"Simulated Instrument\",\"network\":\"MasterCard\"},\"transactionIdentifier\":\"Simulated Identifier\"}}".getBytes();
+        ApplePayRequest payRequest = new ApplePayRequest("merchant.money.rbk.checkout", new Content("application/json", ByteBuffer.wrap(paymentToken
+        )));
+        WrappedPaymentTool wrapped = new WrappedPaymentTool(PaymentRequest.apple(payRequest));
+        UnwrappedPaymentTool unwrapped = client.unwrap(wrapped);
     }
 }
