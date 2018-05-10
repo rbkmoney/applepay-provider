@@ -8,30 +8,38 @@ import java.time.LocalDate;
  * Created by vpankrashkin on 17.04.18.
  */
 public class PaymentDataKeys {
-    @JsonProperty(value = "applicationPrimaryAccountNumber", required = true)
     private String appPrimaryAccountNumber;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyMMdd")
-    @JsonProperty(value = "applicationExpirationDate", required = true)
     private LocalDate appExpirationDate;
-
-    @JsonProperty(value = "currencyCode", required = true)
     private String currencyCode;
-
-    @JsonProperty(value = "transactionAmount", required = true)
     private long transactionAmount;
-
-    @JsonProperty(value = "cardholderName")
     private String cardholderName;
-
-    @JsonProperty(value = "deviceManufacturerIdentifier", required = true)
     private String devManufacturerIdentifier;
-
-    @JsonProperty("paymentDataType")
     private AuthType authType;
-
-    @JsonProperty(value = "paymentData", required = true)
     private AuthData authData;
+
+    @JsonCreator
+    public PaymentDataKeys(
+            @JsonProperty(value = "applicationPrimaryAccountNumber", required = true) String appPrimaryAccountNumber,
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyMMdd")
+            @JsonProperty(value = "applicationExpirationDate", required = true) LocalDate appExpirationDate,
+            @JsonProperty(value = "currencyCode", required = true) String currencyCode,
+            @JsonProperty(value = "transactionAmount", required = true) long transactionAmount,
+            @JsonProperty(value = "cardholderName") String cardholderName,
+            @JsonProperty(value = "deviceManufacturerIdentifier", required = true) String devManufacturerIdentifier,
+            @JsonProperty("paymentDataType") AuthType authType,
+            @JsonProperty(value = "paymentData", required = true) AuthData authData) {
+        this.appPrimaryAccountNumber = appPrimaryAccountNumber;
+        this.appExpirationDate = appExpirationDate;
+        this.currencyCode = currencyCode;
+        this.transactionAmount = transactionAmount;
+        this.cardholderName = cardholderName;
+        this.devManufacturerIdentifier = devManufacturerIdentifier;
+        this.authType = authType;
+        this.authData = authData;
+    }
+
+    public PaymentDataKeys() {
+    }
 
     public String getAppPrimaryAccountNumber() {
         return appPrimaryAccountNumber;
