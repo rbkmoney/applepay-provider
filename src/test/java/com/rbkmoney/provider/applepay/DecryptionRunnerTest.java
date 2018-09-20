@@ -3,24 +3,20 @@ package com.rbkmoney.provider.applepay;
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.base.InvalidRequest;
 import com.rbkmoney.damsel.payment_tool_provider.*;
-import com.rbkmoney.provider.applepay.service.DecryptionTool;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import org.apache.commons.io.IOUtils;
 import org.apache.thrift.TException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
 
 /**
  * Created by vpankrashkin on 19.04.18.
@@ -46,7 +42,7 @@ public class DecryptionRunnerTest {
     @Before
     public void setUp() throws URISyntaxException {
         client = new THSpawnClientBuilder()
-                .withNetworkTimeout(0)
+                .withNetworkTimeout(5000)
                 .withAddress(new URI(thriftUrl))
                 .build(PaymentToolProviderSrv.Iface.class);
     }
@@ -56,7 +52,7 @@ public class DecryptionRunnerTest {
         byte[] paymentToken = IOUtils.toByteArray(this.getClass().getClassLoader().getResourceAsStream("tinkoff.json"));
 
         ApplePayRequest payRequest = new ApplePayRequest("merchant.money.rbk.checkout", new Content("application/json", ByteBuffer.wrap(paymentToken
-                )));
+        )));
         WrappedPaymentTool wrapped = new WrappedPaymentTool(PaymentRequest.apple(payRequest));
         UnwrappedPaymentTool unwrapped = client.unwrap(wrapped);
     }
