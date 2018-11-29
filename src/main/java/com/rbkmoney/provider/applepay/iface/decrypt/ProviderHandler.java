@@ -83,7 +83,7 @@ public class ProviderHandler implements PaymentToolProviderSrv.Iface {
 
             UnwrappedPaymentTool logResult = new UnwrappedPaymentTool(result);
 
-            logResult.getPaymentData().setTokenizedCard(new TokenizedCard("***", null, null));
+            logResult.getPaymentData().setTokenizedCard(new TokenizedCard("***", null, result.getPaymentData().getTokenizedCard().getAuthData()));
             log.info("Unwrap result: {}", logResult);
             return result;
         } catch (IOException e) {
