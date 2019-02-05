@@ -1,0 +1,42 @@
+server:
+  port: @server.port@
+  rest:
+    port: @server.rest.port@
+    endpoint: api/v1
+spring:
+  application:
+    name: @project.name@
+info:
+  version: @project.version@
+  damsel:
+    version: @damsel.version@
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /${server.rest.endpoint}/swag
+apple:
+  validation: true
+  expiration_time: 300000
+  conn_timeout: 3000
+  read_timeout: 3000
+  write_timeout: 3000
+#cert:base:
+cert:
+  identity:
+    path: classpath:apple_keys
+    pass: test
+  processing:
+    path: classpath:apple_keys
+    pass: test
+  ca:
+    path: classpath:AppleRootCA-G3.cer
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+          cors:
+            DefaultCorsProcessor: DEBUG

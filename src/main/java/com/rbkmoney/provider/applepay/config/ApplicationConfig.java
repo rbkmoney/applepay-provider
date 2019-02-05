@@ -32,6 +32,14 @@ import java.nio.file.Files;
 @Configuration
 public class ApplicationConfig {
 
+    public static final String HEALTH = "/actuator/health";
+
+    @Value("${server.rest.port}")
+    private int restPort;
+
+    @Value("/${server.rest.endpoint}/")
+    private String restEndpoint;
+
     @Bean
     public APCertStore certStore(@Value("${cert.base:@null}") String baseDir, @Value("${cert.identity.path:@null}") String identityDir, @Value("${cert.processing.path:@null}") String processingDir) {
         if (baseDir == null && identityDir == null && processingDir == null) {
@@ -69,26 +77,26 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ServletWebServerFactory servletContainer(@Value("${server.rest_port}") int httpPort) {
+    public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
         Connector connector = new Connector();
-        connector.setPort(httpPort);
+        connector.setPort(restPort);
         tomcat.addAdditionalTomcatConnectors(connector);
         return tomcat;
     }
 
     @Bean
-    public FilterRegistrationBean externalPortRestrictingFilter(@Value("${server.rest_port}") int restPort, @Value("/${server.rest_path_prefix}/") String httpPathPrefix) {
+    public FilterRegistrationBean externalPortRestrictingFilter() {
         Filter filter = new OncePerRequestFilter() {
 
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain filterChain) throws ServletException, IOException {
-                if (request.getLocalPort() == restPort) {
-                    if (!(request.getServletPath().startsWith(httpPathPrefix) || request.getServletPath().startsWith("/actuator/health"))) {
-                        response.sendError(404, "Unknown address");
-                        return;
-                    }
+                String servletPath = request.getServletPath();
+                if ((request.getLocalPort() == restPort)
+                        && !(servletPath.startsWith(restEndpoint) || servletPath.startsWith(HEALTH))) {
+                    response.sendError(404, "Unknown address");
+                    return;
                 }
                 filterChain.doFilter(request, response);
             }
@@ -103,24 +111,23 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public FilterRegistrationBean woodyFilter(@Value("${server.rest_port}") int restPort, @Value("/${server.rest_path_prefix}/") String httpPathPrefix) {
+    public FilterRegistrationBean woodyFilter() {
         WFlow wFlow = new WFlow();
         Filter filter = new OncePerRequestFilter() {
 
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain filterChain) throws ServletException, IOException {
-                if (request.getLocalPort() == restPort) {
-                    if (request.getServletPath().startsWith(httpPathPrefix)) {
-                        wFlow.createServiceFork(() -> {
-                            try {
-                                filterChain.doFilter(request, response);
-                            } catch (IOException | ServletException e) {
-                                sneakyThrow(e);
-                            }
-                        }).run();
-                        return;
-                    }
+                if ((request.getLocalPort() == restPort)
+                        && request.getServletPath().startsWith(restEndpoint)) {
+                    wFlow.createServiceFork(() -> {
+                        try {
+                            filterChain.doFilter(request, response);
+                        } catch (IOException | ServletException e) {
+                            sneakyThrow(e);
+                        }
+                    }).run();
+                    return;
                 }
                 filterChain.doFilter(request, response);
             }
@@ -134,7 +141,7 @@ public class ApplicationConfig {
         filterRegistrationBean.setFilter(filter);
         filterRegistrationBean.setOrder(-50);
         filterRegistrationBean.setName("woodyFilter");
-        filterRegistrationBean.addUrlPatterns(httpPathPrefix+"*");
+        filterRegistrationBean.addUrlPatterns(restEndpoint + "*");
         return filterRegistrationBean;
     }
 

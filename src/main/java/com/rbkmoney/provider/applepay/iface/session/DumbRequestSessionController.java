@@ -24,16 +24,16 @@ import org.springframework.web.bind.annotation.*;
  */
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/${server.rest.endpoint}")
 @Api(description = "Session creation API")
 public class DumbRequestSessionController {
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private SessionService service;
 
     private ObjectWriter writer = new ObjectMapper().writer();
-
 
     @ApiOperation(value = "Request ApplePay session", notes = "")
     @PostMapping(value = "/session", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/json")
@@ -43,7 +43,6 @@ public class DumbRequestSessionController {
             @ApiResponse(code = 503, message = "Apple Pay service unavailable")
     })
     @CrossOrigin
-
     public ResponseEntity<String> getSession(@RequestBody SessionRequest request) {
         log.info("New Session request: {}", request);
 

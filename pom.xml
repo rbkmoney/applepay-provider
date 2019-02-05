@@ -3,6 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+    <name>Apple pay</name>
 
     <parent>
         <groupId>com.rbkmoney</groupId>
@@ -15,10 +17,9 @@
     <version>1.0.5-SNAPSHOT</version>
 
     <properties>
-        <project.maintainer>Vladimir Pankrashkin &lt;v.pankrashkin@rbkmoney.com&gt;</project.maintainer>
         <server.port>8022</server.port>
-        <server.rest_port>8080</server.rest_port>
-        <exposed.ports>${server.port} ${server.rest_port}</exposed.ports>
+        <server.rest.port>8080</server.rest.port>
+        <exposed.ports>${server.port} ${server.rest.port}</exposed.ports>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <dockerfile.base.service.tag>22c57470c4fc47161894f036b7cf9d70f42b75f5</dockerfile.base.service.tag>
         <damsel.version>1.232-5e54b26</damsel.version>
