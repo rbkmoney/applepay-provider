@@ -17,7 +17,7 @@ public class PaymentHeader {
             @JsonProperty(value = "ephemeralPublicKey") String ephemeralPublicKey, //EC_v1 only
             @JsonProperty(value = "wrapppedKey") String wrappedKey, //RSA_v1 only
             @JsonProperty(value = "publicKeyHash", required = true) String publicKeyHash,
-            @JsonProperty(value = "transactionId", required = true)String transactionId) {
+            @JsonProperty(value = "transactionId", required = true) String transactionId) {
         this.applicationData = applicationData;
         this.ephemeralPublicKey = ephemeralPublicKey;
         this.wrappedKey = wrappedKey;

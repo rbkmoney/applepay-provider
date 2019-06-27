@@ -5,16 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Created by vpankrashkin on 09.04.18.
- */
 public class APCertStore {
     private final Path identityCerDir;
     private final Path processingCerDir;
 
     public APCertStore(String identityCerDir, String processingCerDir) {
-           this.identityCerDir = Paths.get(identityCerDir);
-           this.processingCerDir = Paths.get(processingCerDir);
+        this.identityCerDir = Paths.get(identityCerDir);
+        this.processingCerDir = Paths.get(processingCerDir);
     }
 
     public APCertStore(String baseDir) {

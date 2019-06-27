@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
 
-/**
- * Created by vpankrashkin on 12.04.18.
- */
 public class SSLProvider {
 
     public SSLSocketFactory getSSLForClient(byte[] identityCert, char[] pass) throws CryptoException {

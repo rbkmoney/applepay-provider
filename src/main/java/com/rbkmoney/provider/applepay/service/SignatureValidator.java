@@ -54,69 +54,6 @@ public class SignatureValidator {
         this.expirationInMs = expirationInMs;
     }
 
-    public void validate(PaymentHeader applePayHeader, String applePayData,
-                                String applePaySignature, String version) throws ValidationException {
-        try {
-            boolean eccSign = isECC(version);
-
-            byte[] signedData = eccSign ? getECCSignedData(applePayData, applePayHeader) : getRSASignedData(applePayData, applePayHeader);
-
-            CMSProcessable signedDataPrc = new CMSProcessableByteArray(signedData);
-            CMSSignedData cmsSignedData = new CMSSignedData(signedDataPrc, decode(applePaySignature));
-
-            Store store = cmsSignedData.getCertificates();
-            ArrayList<X509CertificateHolder> allCertificates = (ArrayList<X509CertificateHolder>) store.getMatches(null);
-            SignerInformation signerInformation = (SignerInformation) cmsSignedData.getSignerInfos().getSigners().stream().findFirst().orElseThrow(() -> new ValidationException("Cannot extract siner info"));
-
-            List<X509Certificate> x509Certificates = new ArrayList<>();
-            for (X509CertificateHolder certificate : allCertificates) {
-                x509Certificates.add(new JcaX509CertificateConverter().setProvider(BC).getCertificate(certificate));
-            }
-
-            // step 1:
-            // Ensure that the certificates contain the correct custom OIDs: 1.2.840.113635.100.6.29
-            // for the leaf certificate and 1.2.840.113635.100.6.2.14 for the intermediate CA. The value for these marker OIDs doesn’t matter, only their presence.
-            validateCustomData(allCertificates);
-
-            X509Certificate appleRootCertificate;
-            // step 2:
-            // Ensure that the root CA is the Apple Root CA - G3. This certificate is available from apple.com/certificateauthority.
-            try (InputStream inputStream = getRootCA()) {
-                CertificateFactory certificateFactory = CertificateFactory.getInstance(X_509);
-                appleRootCertificate = (X509Certificate) certificateFactory.generateCertificate(inputStream);
-            }
-
-            // step 3:
-            // Ensure that there is a valid X.509 chain of trust from the signature to the root CA. Specifically,
-            // ensure that the signature was created using the private key corresponding to the leaf certificate,
-            // that the leaf certificate is signed by the intermediate CA, and that the intermediate CA is signed by the Apple Root CA - G3.
-            validateCertificate(x509Certificates.get(0), appleRootCertificate, x509Certificates);
-
-            // step 4:
-            // Ensure that the signature is:
-            // - a valid ECDSA signature (ecdsa-with-SHA256 1.2.840.10045.4.3.2) of the
-            // concatenated values of the ephemeralPublicKey, data, transactionId, and applicationData keys.
-            // - a valid RSA signature (RSA-with-SHA256 1.2.840.113549.1.1.11) of the
-            //concatenated values of the wrappedKey, data, transactionId, and applicationData keys.
-            validateECCSignature(signerInformation, store);
-
-            // step 5:
-            // Inspect the CMS signing time of the signature, as defined by section 11.3 of RFC 5652.
-            // If the time signature and the transaction time differ by more than a few minutes, it's possible that the token is a replay attack.
-            if (expirationInMs >= 0) {
-                validateSignatureTime(expirationInMs, signerInformation);
-            }
-        } catch (ValidationException e) {
-            throw e;
-        } catch (Throwable t) {
-            throw new ValidationException("Unknown validation error:"+t.getMessage(), t);
-        }
-    }
-
-    private InputStream getRootCA() {
-        return new ByteArrayInputStream(appleRootCACert);
-    }
-
     private static boolean isECC(String type) {
         if (ECC_TYPE.equals(type)) {
             return true;
@@ -246,5 +183,68 @@ public class SignatureValidator {
         }
 
         return byteArrayOutputStream.toByteArray();
+    }
+
+    public void validate(PaymentHeader applePayHeader, String applePayData,
+                         String applePaySignature, String version) throws ValidationException {
+        try {
+            boolean eccSign = isECC(version);
+
+            byte[] signedData = eccSign ? getECCSignedData(applePayData, applePayHeader) : getRSASignedData(applePayData, applePayHeader);
+
+            CMSProcessable signedDataPrc = new CMSProcessableByteArray(signedData);
+            CMSSignedData cmsSignedData = new CMSSignedData(signedDataPrc, decode(applePaySignature));
+
+            Store store = cmsSignedData.getCertificates();
+            ArrayList<X509CertificateHolder> allCertificates = (ArrayList<X509CertificateHolder>) store.getMatches(null);
+            SignerInformation signerInformation = (SignerInformation) cmsSignedData.getSignerInfos().getSigners().stream().findFirst().orElseThrow(() -> new ValidationException("Cannot extract siner info"));
+
+            List<X509Certificate> x509Certificates = new ArrayList<>();
+            for (X509CertificateHolder certificate : allCertificates) {
+                x509Certificates.add(new JcaX509CertificateConverter().setProvider(BC).getCertificate(certificate));
+            }
+
+            // step 1:
+            // Ensure that the certificates contain the correct custom OIDs: 1.2.840.113635.100.6.29
+            // for the leaf certificate and 1.2.840.113635.100.6.2.14 for the intermediate CA. The value for these marker OIDs doesn’t matter, only their presence.
+            validateCustomData(allCertificates);
+
+            X509Certificate appleRootCertificate;
+            // step 2:
+            // Ensure that the root CA is the Apple Root CA - G3. This certificate is available from apple.com/certificateauthority.
+            try (InputStream inputStream = getRootCA()) {
+                CertificateFactory certificateFactory = CertificateFactory.getInstance(X_509);
+                appleRootCertificate = (X509Certificate) certificateFactory.generateCertificate(inputStream);
+            }
+
+            // step 3:
+            // Ensure that there is a valid X.509 chain of trust from the signature to the root CA. Specifically,
+            // ensure that the signature was created using the private key corresponding to the leaf certificate,
+            // that the leaf certificate is signed by the intermediate CA, and that the intermediate CA is signed by the Apple Root CA - G3.
+            validateCertificate(x509Certificates.get(0), appleRootCertificate, x509Certificates);
+
+            // step 4:
+            // Ensure that the signature is:
+            // - a valid ECDSA signature (ecdsa-with-SHA256 1.2.840.10045.4.3.2) of the
+            // concatenated values of the ephemeralPublicKey, data, transactionId, and applicationData keys.
+            // - a valid RSA signature (RSA-with-SHA256 1.2.840.113549.1.1.11) of the
+            //concatenated values of the wrappedKey, data, transactionId, and applicationData keys.
+            validateECCSignature(signerInformation, store);
+
+            // step 5:
+            // Inspect the CMS signing time of the signature, as defined by section 11.3 of RFC 5652.
+            // If the time signature and the transaction time differ by more than a few minutes, it's possible that the token is a replay attack.
+            if (expirationInMs >= 0) {
+                validateSignatureTime(expirationInMs, signerInformation);
+            }
+        } catch (ValidationException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new ValidationException("Unknown validation error:" + t.getMessage(), t);
+        }
+    }
+
+    private InputStream getRootCA() {
+        return new ByteArrayInputStream(appleRootCACert);
     }
 }

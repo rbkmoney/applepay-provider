@@ -15,7 +15,6 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.Filter;
@@ -26,9 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Files;
 
-/**
- * Created by vpankrashkin on 10.04.18.
- */
 @Configuration
 public class ApplicationConfig {
 
@@ -58,7 +54,7 @@ public class ApplicationConfig {
                                          @Value("${apple.conn_timeout}") int connTimeoutMs,
                                          @Value("${apple.read_timeout}") int readTimeoutMs,
                                          @Value("${apple.write_timeout}") int writeTimeoutMs) {
-        return new SessionService(certStore, identityPass, connTimeoutMs, readTimeoutMs, writeTimeoutMs);
+        return new SessionService(certStore, identityPass.toCharArray(), connTimeoutMs, readTimeoutMs, writeTimeoutMs);
     }
 
     @Bean
@@ -73,7 +69,7 @@ public class ApplicationConfig {
 
     @Bean
     public PaymentToolProviderSrv.Iface providerHandler(SignatureValidator validator, DecryptionService decryptionService, @Value("${apple.validation}") Boolean validation) {
-       return new ProviderHandler(validator, decryptionService, validation);
+        return new ProviderHandler(validator, decryptionService, validation);
     }
 
     @Bean
@@ -145,17 +141,4 @@ public class ApplicationConfig {
         return filterRegistrationBean;
     }
 
-    //@Bean
-    public CommonsRequestLoggingFilter logFilter() {
-        CommonsRequestLoggingFilter filter
-                = new CommonsRequestLoggingFilter() {
-            @Override
-            protected void beforeRequest(HttpServletRequest request, String message) { }
-        };
-        filter.setIncludePayload(true);
-        filter.setMaxPayloadLength(10000);
-        filter.setAfterMessagePrefix("REQUEST DATA:[");
-
-        return filter;
-    }
 }

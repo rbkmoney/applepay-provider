@@ -1,8 +1,5 @@
 package com.rbkmoney.provider.applepay.service;
 
-/**
- * Created by vpankrashkin on 12.04.18.
- */
 public class APSessionException extends Exception {
     private String payload;
 

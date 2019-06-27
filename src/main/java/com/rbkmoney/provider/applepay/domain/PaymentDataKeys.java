@@ -1,14 +1,24 @@
 package com.rbkmoney.provider.applepay.domain;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
-/**
- * Created by vpankrashkin on 17.04.18.
- */
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class PaymentDataKeys {
+
+    @ToString.Exclude
     private String appPrimaryAccountNumber;
+    @ToString.Exclude
     private LocalDate appExpirationDate;
     private String currencyCode;
     private long transactionAmount;
@@ -38,84 +48,4 @@ public class PaymentDataKeys {
         this.authData = authData;
     }
 
-    public PaymentDataKeys() {
-    }
-
-    public String getAppPrimaryAccountNumber() {
-        return appPrimaryAccountNumber;
-    }
-
-    public void setAppPrimaryAccountNumber(String appPrimaryAccountNumber) {
-        this.appPrimaryAccountNumber = appPrimaryAccountNumber;
-    }
-
-    public LocalDate getAppExpirationDate() {
-        return appExpirationDate;
-    }
-
-    public void setAppExpirationDate(LocalDate appExpirationDate) {
-        this.appExpirationDate = appExpirationDate;
-    }
-
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
-
-    public long getTransactionAmount() {
-        return transactionAmount;
-    }
-
-    public void setTransactionAmount(long transactionAmount) {
-        this.transactionAmount = transactionAmount;
-    }
-
-    public String getCardholderName() {
-        return cardholderName;
-    }
-
-    public void setCardholderName(String cardholderName) {
-        this.cardholderName = cardholderName;
-    }
-
-    public String getDevManufacturerIdentifier() {
-        return devManufacturerIdentifier;
-    }
-
-    public void setDevManufacturerIdentifier(String devManufacturerIdentifier) {
-        this.devManufacturerIdentifier = devManufacturerIdentifier;
-    }
-
-    public AuthType getAuthType() {
-        return authType;
-    }
-
-    public void setAuthType(AuthType authType) {
-        this.authType = authType;
-    }
-
-    public AuthData getAuthData() {
-        return authData;
-    }
-
-    public void setAuthData(AuthData authData) {
-        this.authData = authData;
-    }
-
-    @Override
-    public String toString() {
-        return "PaymentDataKeys{" +
-                "appPrimaryAccountNumber='" + (appPrimaryAccountNumber != null ? "***" : null) + '\'' +
-                ", appExpirationDate=" + (appExpirationDate != null ? "***" : null) +
-                ", currencyCode='" + currencyCode + '\'' +
-                ", transactionAmount=" + transactionAmount +
-                ", cardholderName='" + cardholderName + '\'' +
-                ", devManufacturerIdentifier='" + devManufacturerIdentifier + '\'' +
-                ", authType=" + authType +
-                ", authData=" + authData +
-                '}';
-    }
 }

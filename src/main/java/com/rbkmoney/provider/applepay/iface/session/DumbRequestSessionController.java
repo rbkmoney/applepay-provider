@@ -11,6 +11,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,26 +21,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Created by vpankrashkin on 04.04.18.
- */
-
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/${server.rest.endpoint}")
-@Api(description = "Session creation API")
 public class DumbRequestSessionController {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final SessionService service;
 
-    @Autowired
-    private SessionService service;
+    private final ObjectWriter writer = new ObjectMapper().writer();
 
-    private ObjectWriter writer = new ObjectMapper().writer();
-
-    @ApiOperation(value = "Request ApplePay session", notes = "")
+    @ApiOperation(value = "Request ApplePay session")
     @PostMapping(value = "/session", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, headers = "Content-Type=application/json")
     @ApiResponses(value = {
-            @ApiResponse(code= 200, message = "Apple Pay session object"),
+            @ApiResponse(code = 200, message = "Apple Pay session object"),
             @ApiResponse(code = 500, message = "Internal service error"),
             @ApiResponse(code = 503, message = "Apple Pay service unavailable")
     })

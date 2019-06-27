@@ -3,10 +3,13 @@ package com.rbkmoney.provider.applepay.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-/**
- * Created by vpankrashkin on 29.03.18.
- */
+@Getter
+@ToString
+@NoArgsConstructor
 @JsonRootName("token")
 public class PaymentToken {
     private PaymentData paymentData;
@@ -23,39 +26,4 @@ public class PaymentToken {
         this.transactionId = transactionId;
     }
 
-    public PaymentToken() {
-    }
-
-    public PaymentData getPaymentData() {
-        return paymentData;
-    }
-
-    public void setPaymentData(PaymentData paymentData) {
-        this.paymentData = paymentData;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    @Override
-    public String toString() {
-        return "PaymentToken{" +
-                "paymentData=" + paymentData +
-                ", paymentMethod=" + paymentMethod +
-                ", transactionId='" + transactionId + '\'' +
-                '}';
-    }
 }

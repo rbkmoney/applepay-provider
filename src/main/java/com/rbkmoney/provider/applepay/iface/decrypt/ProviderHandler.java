@@ -10,18 +10,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rbkmoney.damsel.base.Content;
 import com.rbkmoney.damsel.base.InvalidRequest;
 import com.rbkmoney.damsel.domain.BankCardPaymentSystem;
-import com.rbkmoney.damsel.payment_tool_provider.*;
 import com.rbkmoney.damsel.payment_tool_provider.Auth3DS;
 import com.rbkmoney.damsel.payment_tool_provider.AuthData;
+import com.rbkmoney.damsel.payment_tool_provider.*;
 import com.rbkmoney.geck.common.util.TypeUtil;
 import com.rbkmoney.provider.applepay.domain.*;
 import com.rbkmoney.provider.applepay.service.CertNotFoundException;
 import com.rbkmoney.provider.applepay.service.CryptoException;
 import com.rbkmoney.provider.applepay.service.DecryptionService;
 import com.rbkmoney.provider.applepay.service.SignatureValidator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -29,27 +29,19 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by vpankrashkin on 03.04.18.
- */
+@Slf4j
+@RequiredArgsConstructor
 public class ProviderHandler implements PaymentToolProviderSrv.Iface {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final SignatureValidator validator;
     private final DecryptionService decryptionService;
     private final ObjectReader inReader = new ObjectMapper().readerFor(PaymentToken.class).with(DeserializationFeature.UNWRAP_ROOT_VALUE);
-    private final ObjectReader outReader = new ObjectMapper(){{
+    private final ObjectReader outReader = new ObjectMapper() {{
         registerModule(new SimpleModule() {{
             addDeserializer(com.rbkmoney.provider.applepay.domain.AuthData.class, new AuthDeserializer());
         }});
     }}.registerModule(new JavaTimeModule()).readerFor(PaymentDataKeys.class);
     private final boolean enableValidation;
-
-    public ProviderHandler(SignatureValidator validator, DecryptionService decryptionService, boolean enableValidation) {
-        this.validator = validator;
-        this.decryptionService = decryptionService;
-        this.enableValidation = enableValidation;
-    }
 
     @Override
     public UnwrappedPaymentTool unwrap(WrappedPaymentTool payment_tool) throws InvalidRequest, TException {
@@ -114,7 +106,7 @@ public class ProviderHandler implements PaymentToolProviderSrv.Iface {
             }
         }
         cardInfo.setCardClass(TypeUtil.toEnumField(
-                Optional.ofNullable(paymentToken.getPaymentMethod().getPaymentMethodType()).map(s-> s.toLowerCase()).orElse(null),
+                Optional.ofNullable(paymentToken.getPaymentMethod().getPaymentMethodType()).map(s -> s.toLowerCase()).orElse(null),
                 CardClass.class, CardClass.unknown));
         cardInfo.setPaymentSystem(TypeUtil.toEnumField(
                 Optional.ofNullable(paymentToken.getPaymentMethod().getPaymentNetwork()).map(s -> s.toLowerCase()).orElse(null),
@@ -156,12 +148,12 @@ public class ProviderHandler implements PaymentToolProviderSrv.Iface {
         switch (dataKeys.getAuthType()) {
             case Auth3DS:
                 if (!(dataKeys.getAuthData() instanceof com.rbkmoney.provider.applepay.domain.Auth3DS)) {
-                    throw new IOException("Wrong json data type:"+dataKeys.getAuthData());
+                    throw new IOException("Wrong json data type:" + dataKeys.getAuthData());
                 }
                 break;
             case AuthEMV:
                 if (!(dataKeys.getAuthData() instanceof AuthEMV)) {
-                    throw new IOException("Wrong json data type:"+dataKeys.getAuthData());
+                    throw new IOException("Wrong json data type:" + dataKeys.getAuthData());
                 }
         }
     }
@@ -182,13 +174,13 @@ public class ProviderHandler implements PaymentToolProviderSrv.Iface {
 
             try {
                 tdsParser.nextToken();
-                return (com.rbkmoney.provider.applepay.domain.Auth3DS)tdsDes.deserialize(tdsParser, ctxt);
+                return (com.rbkmoney.provider.applepay.domain.Auth3DS) tdsDes.deserialize(tdsParser, ctxt);
             } catch (IOException e) {
                 JsonParser emvParser = node.traverse(ctxt.getParser().getCodec());
                 emvParser.nextToken();
                 JavaType emvType = ctxt.getTypeFactory().constructType(com.rbkmoney.provider.applepay.domain.AuthEMV.class);
                 JsonDeserializer emvDes = ctxt.findRootValueDeserializer(emvType);
-                return (com.rbkmoney.provider.applepay.domain.AuthEMV)emvDes.deserialize(emvParser, ctxt);
+                return (com.rbkmoney.provider.applepay.domain.AuthEMV) emvDes.deserialize(emvParser, ctxt);
 
             }
         }

@@ -2,10 +2,13 @@ package com.rbkmoney.provider.applepay.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-/**
- * Created by vpankrashkin on 29.03.18.
- */
+@Getter
+@ToString
+@NoArgsConstructor
 public class PaymentData {
     private String version;
     private String data;
@@ -24,45 +27,4 @@ public class PaymentData {
         this.header = header;
     }
 
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public PaymentHeader getHeader() {
-        return header;
-    }
-
-    public void setHeader(PaymentHeader header) {
-        this.header = header;
-    }
-
-    @Override
-    public String toString() {
-        return "PaymentData{" +
-                "version='" + version + '\'' +
-                ", data='" + data + '\'' +
-                ", signature='" + signature + '\'' +
-                ", header=" + header +
-                '}';
-    }
 }

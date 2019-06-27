@@ -1,8 +1,5 @@
 package com.rbkmoney.provider.applepay.store;
 
-/**
- * Created by vpankrashkin on 10.04.18.
- */
 public class CertStoreException extends RuntimeException {
     public CertStoreException() {
     }

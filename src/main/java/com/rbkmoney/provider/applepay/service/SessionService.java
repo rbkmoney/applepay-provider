@@ -5,36 +5,24 @@ import com.rbkmoney.woody.api.flow.error.WErrorDefinition;
 import com.rbkmoney.woody.api.flow.error.WRuntimeException;
 import com.rbkmoney.woody.api.trace.context.TraceContext;
 import com.rbkmoney.woody.thrift.impl.http.error.THTransportErrorMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by vpankrashkin on 10.04.18.
- */
+@Slf4j
+@RequiredArgsConstructor
 public class SessionService {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final APCertStore certStore;
+    private final char[] identityPass;
     private final int connTimeoutMs;
     private final int readTimeoutMs;
     private final int writeTimeoutMs;
-    private final char[] identityPass;
-    private final SSLProvider sslProvider;
-    private final THTransportErrorMapper errorMapper;
-
-    public SessionService(APCertStore certStore, String identityPass, int connTimeoutMs, int readTimeoutMs, int writeTimeoutMs) {
-        this.certStore = certStore;
-        this.connTimeoutMs = connTimeoutMs;
-        this.readTimeoutMs = readTimeoutMs;
-        this.writeTimeoutMs = writeTimeoutMs;
-        this.identityPass = identityPass.toCharArray();
-        this.sslProvider = new SSLProvider();
-        this.errorMapper = new THTransportErrorMapper();
-    }
+    private final SSLProvider sslProvider = new SSLProvider();
+    private final THTransportErrorMapper errorMapper = new THTransportErrorMapper();
 
     public String requestSession(String merchantId, String validationURL, String body) throws CryptoException, CertNotFoundException, APSessionException, WRuntimeException {
         byte[] identityCert = certStore.getIdentityCert(merchantId);

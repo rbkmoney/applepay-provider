@@ -1,8 +1,5 @@
 package com.rbkmoney.provider.applepay.service;
 
-/**
- * Created by vpankrashkin on 10.04.18.
- */
 public class CertNotFoundException extends CryptoException {
     public CertNotFoundException() {
     }

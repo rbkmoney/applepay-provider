@@ -1,6 +1,5 @@
 package com.rbkmoney.provider.applepay.service;
 
-import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.KDFParameters;
@@ -42,7 +41,7 @@ public class DecryptionTool {
 
     }
 
-    public static String decrypt(String ephemeralPublicKeyData, byte[] tokenData,  byte[] merchantCerData, byte[] pkcs12KeyData, char[] pkcs12KeyPass) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, NoSuchProviderException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException {
+    public static String decrypt(String ephemeralPublicKeyData, byte[] tokenData, byte[] merchantCerData, byte[] pkcs12KeyData, char[] pkcs12KeyPass) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, NoSuchProviderException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException {
         // read the ephemeral public key. It's a PEM file without header/footer -- add it back to make our lives easy
         String ephemeralPubKeyStr = "-----BEGIN PUBLIC KEY-----\n" + ephemeralPublicKeyData + "\n-----END PUBLIC KEY-----";
         PEMReader pemReaderPublic = new PEMReader(new StringReader(ephemeralPubKeyStr));
@@ -62,7 +61,7 @@ public class DecryptionTool {
 
     /**
      * @return same value, as contained in publicKeyHash field
-     * */
+     */
     public static String pubKeyHashBase64(X509Certificate merchCer) throws NoSuchAlgorithmException {
         return Base64.getEncoder().encodeToString(pubKeyHashBytes(merchCer));
     }

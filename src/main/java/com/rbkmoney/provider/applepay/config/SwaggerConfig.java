@@ -3,18 +3,15 @@ package com.rbkmoney.provider.applepay.config;
 import com.rbkmoney.provider.applepay.iface.session.DumbRequestSessionController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by vpankrashkin on 04.04.18.
- */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
@@ -25,7 +22,7 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage(DumbRequestSessionController.class.getPackage().getName()))
                 .paths(PathSelectors.any())
                 .build();
-        docket.produces(new HashSet(){{add("application/json");}});
+        docket.produces(Set.of(MediaType.APPLICATION_JSON_VALUE));
         docket.forCodeGeneration(true);
         return docket;
     }

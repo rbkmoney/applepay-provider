@@ -1,8 +1,5 @@
 package com.rbkmoney.provider.applepay.domain;
 
-/**
- * Created by vpankrashkin on 30.03.18.
- */
 public class ValidationException extends RuntimeException {
     public ValidationException() {
     }
