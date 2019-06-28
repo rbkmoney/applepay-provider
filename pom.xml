@@ -13,8 +13,8 @@
 
     <groupId>com.rbkmoney.provider</groupId>
     <artifactId>applepay</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
-    <name>provider-applepay</name>
+    <version>1.0.7-SNAPSHOT</version>
+    <name>adapter-applepay</name>
 
     <properties>
         <server.port>8022</server.port>
@@ -113,12 +113,12 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>2.8.0</version>
+            <version>2.9.2</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.8.0</version>
+            <version>2.9.2</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
