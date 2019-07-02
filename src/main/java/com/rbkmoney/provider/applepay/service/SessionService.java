@@ -9,7 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.net.Socket;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -57,7 +63,8 @@ public class SessionService {
                 .writeTimeout(writeTimeoutMs, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeoutMs, TimeUnit.MILLISECONDS)
                 .addInterceptor(new HttpLoggingInterceptor())
-                .sslSocketFactory(sslProvider.getSSLForClient(identityCert, pass)).build();
+                .sslSocketFactory(sslProvider.getSSLForClient(identityCert, pass), sslProvider.getX509TrustManager())
+                .build();
     }
 
     private Request prepareRequest(String validationURL, String body) {

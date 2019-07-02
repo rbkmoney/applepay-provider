@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 
 public class SSLProvider {
 
@@ -17,19 +18,34 @@ public class SSLProvider {
             keyManagerFactory.init(appKeyStore, pass);
             KeyManager[] keyManagers = keyManagerFactory.getKeyManagers();
 
-            TrustManagerFactory tmf =
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init((KeyStore) null);
-            TrustManager[] trustManagers = tmf.getTrustManagers();
-
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(keyManagers, trustManagers, null);
+            SSLContext context = SSLContext.getInstance("TLSv1.2");
+            context.init(keyManagers, getTrustManagerFactory().getTrustManagers(), null);
 
             return context.getSocketFactory();
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | KeyManagementException e) {
-            throw new CryptoException(e);
-        } catch (IOException e) {
-            throw new RuntimeException("Unexpected error", e);
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | KeyManagementException ex) {
+            throw new CryptoException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException("Unexpected error", ex);
+        }
+    }
+
+    public X509TrustManager getX509TrustManager() throws CryptoException {
+        TrustManager[] trustManagers = getTrustManagerFactory().getTrustManagers();
+        for (TrustManager trustManager : trustManagers) {
+            if (trustManager instanceof X509TrustManager) {
+                return (X509TrustManager) trustManager;
+            }
+        }
+        throw new CryptoException("Unexpected default trust managers: " + Arrays.toString(trustManagers));
+    }
+
+    public TrustManagerFactory getTrustManagerFactory() throws CryptoException {
+        try {
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init((KeyStore) null);
+            return tmf;
+        } catch (NoSuchAlgorithmException | KeyStoreException ex) {
+            throw new CryptoException(ex);
         }
     }
 
