@@ -1,5 +1,6 @@
 package com.rbkmoney.provider.applepay.service;
 
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.KDFParameters;
@@ -16,7 +17,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.util.Base64;
 import java.util.Enumeration;
 
 public class DecryptionTool {
@@ -59,11 +59,53 @@ public class DecryptionTool {
         return new String(plaintext, "ASCII");
     }
 
+
+    public static String decrypt(String ephemeralPublicKeyData, byte[] tokenData, byte[] pkcs12Data, X509Certificate merchantCertificate, char[] pkcs12KeyPass) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, NoSuchProviderException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException {
+        // read the ephemeral public key. It's a PEM file without header/footer -- add it back to make our lives easy
+        String ephemeralPubKeyStr = "-----BEGIN PUBLIC KEY-----\n" + ephemeralPublicKeyData + "\n-----END PUBLIC KEY-----";
+        PEMReader pemReaderPublic = new PEMReader(new StringReader(ephemeralPubKeyStr));
+        ECPublicKey ephemeralPublicKey = (ECPublicKey) pemReaderPublic.readObject();
+
+        byte[] merchantIdentifier = extractMerchantIdentifier(merchantCertificate);
+
+        // load the merchant EC private key
+        ECPrivateKey merchantPrivateKey = loadPrivateKey(pkcs12Data, pkcs12KeyPass);
+
+        // decrypt per Apple Pay spec
+        final byte[] plaintext = decrypt(tokenData, merchantPrivateKey, ephemeralPublicKey, merchantIdentifier);
+        return new String(plaintext, "ASCII");
+    }
+
+    public static X509Certificate getCertificate(byte[] pkcs12Data, char[] pkcs12KeyPass) throws NoSuchProviderException, KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+        KeyStore keystore = KeyStore.getInstance("PKCS12", "BC");
+        keystore.load(new ByteArrayInputStream(pkcs12Data), pkcs12KeyPass);
+        Enumeration<String> aliases = keystore.aliases();
+        String alias = null;
+        while (aliases.hasMoreElements()) {
+            alias = aliases.nextElement();
+        }
+        return (X509Certificate) keystore.getCertificate(alias);
+    }
+
+    public static String getMerchantUID(X509Certificate merchantCertificate) {
+        Principal subject = merchantCertificate.getSubjectX500Principal();
+        String subjectArray[] = subject.toString().split(",");
+        for (String s : subjectArray) {
+            String[] str = s.trim().split("=");
+            String key = str[0];
+            String value = str[1];
+            if (key.equals("UID")) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     /**
      * @return same value, as contained in publicKeyHash field
      */
-    public static String pubKeyHashBase64(X509Certificate merchCer) throws NoSuchAlgorithmException {
-        return Base64.getEncoder().encodeToString(pubKeyHashBytes(merchCer));
+    public static String pubKeyHash(X509Certificate merchCer) throws NoSuchAlgorithmException {
+        return Hex.encodeHexString(pubKeyHashBytes(merchCer));
     }
 
     public static byte[] pubKeyHashBytes(X509Certificate merchCer) throws NoSuchAlgorithmException {
@@ -100,7 +142,7 @@ public class DecryptionTool {
     private static ECPrivateKey loadPrivateKey(byte[] pkcs12Data, char[] pass) throws KeyStoreException, NoSuchProviderException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
         KeyStore keystore = KeyStore.getInstance("PKCS12", "BC");
         keystore.load(new ByteArrayInputStream(pkcs12Data), pass);
-        assert keystore.size() == 1 : "wrong number of entries in keychain";
+        assert keystore.size() == 1 || keystore.size() == 2 : "wrong number of entries in keychain";
         Enumeration<String> aliases = keystore.aliases();
         String alias = null;
         while (aliases.hasMoreElements()) {

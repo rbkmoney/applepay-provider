@@ -1,5 +1,6 @@
 package com.rbkmoney.provider.applepay.store;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +19,6 @@ public class APCertStore {
         this(Paths.get(baseDir, "identity").toString(), Paths.get(baseDir, "processing").toString());
     }
 
-
     public byte[] getIdentityCert(String merchantId) {
         return getCert(identityCerDir, merchantId, null, ".p12");
     }
@@ -29,6 +29,10 @@ public class APCertStore {
 
     public byte[] getProcessingCert(String merchantId, String cerHash) {
         return getCert(processingCerDir, merchantId, cerHash, ".cer");
+    }
+
+    public File[] getMerchantCertsList() {
+        return new File(processingCerDir.toString()).listFiles((folder1, name) -> name.endsWith(".p12"));
     }
 
     private byte[] getCert(Path baseDir, String merchantId, String certHash, String suffix) {
