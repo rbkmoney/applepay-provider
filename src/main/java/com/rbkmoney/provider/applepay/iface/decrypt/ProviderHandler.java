@@ -24,10 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 
 import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -92,7 +88,7 @@ public class ProviderHandler implements PaymentToolProviderSrv.Iface {
             String message = String.format("Not found cert data for merchant: %s", payment_tool.getRequest().getApple().getMerchantId());
             log.warn(message, e);
             throw new InvalidRequest(Arrays.asList(message));
-        } catch (CryptoException | NoSuchAlgorithmException | CertificateException | NoSuchProviderException | KeyStoreException e) {
+        } catch (CryptoException e) {
             log.error("Decryption error", e);
             throw new RuntimeException(e);
         }

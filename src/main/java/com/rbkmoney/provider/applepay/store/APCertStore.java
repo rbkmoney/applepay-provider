@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 public class APCertStore {
     private final Path identityCerDir;
     private final Path processingCerDir;
+    private final String SUFFIX_P12 = ".p12";
+    private final String SUFFIX_CER = ".cer";
 
     public APCertStore(String identityCerDir, String processingCerDir) {
         this.identityCerDir = Paths.get(identityCerDir);
@@ -20,19 +22,19 @@ public class APCertStore {
     }
 
     public byte[] getIdentityCert(String merchantId) {
-        return getCert(identityCerDir, merchantId, null, ".p12");
+        return getCert(identityCerDir, merchantId, null, SUFFIX_P12);
     }
 
     public byte[] getProcessingKeyCert(String merchantId, String cerHash) {
-        return getCert(processingCerDir, merchantId, cerHash, ".p12");
+        return getCert(processingCerDir, merchantId, cerHash, SUFFIX_P12);
     }
 
     public byte[] getProcessingCert(String merchantId, String cerHash) {
-        return getCert(processingCerDir, merchantId, cerHash, ".cer");
+        return getCert(processingCerDir, merchantId, cerHash, SUFFIX_CER);
     }
 
     public File[] getMerchantCertsList() {
-        return new File(processingCerDir.toString()).listFiles((folder1, name) -> name.endsWith(".p12"));
+        return new File(processingCerDir.toString()).listFiles((folder1, name) -> name.endsWith(SUFFIX_P12));
     }
 
     private byte[] getCert(Path baseDir, String merchantId, String certHash, String suffix) {
