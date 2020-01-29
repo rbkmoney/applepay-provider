@@ -7,6 +7,7 @@ import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import org.apache.commons.io.IOUtils;
 import org.apache.thrift.TException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ import java.nio.ByteBuffer;
         }
 )
 
+@Ignore
 public class DecryptionRunnerTest {
 
     @Value("http://127.0.0.1:${server.port}/provider/apple")
