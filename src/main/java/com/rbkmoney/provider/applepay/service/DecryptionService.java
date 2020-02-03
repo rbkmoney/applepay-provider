@@ -3,6 +3,7 @@ package com.rbkmoney.provider.applepay.service;
 import com.rbkmoney.provider.applepay.domain.PaymentToken;
 import com.rbkmoney.provider.applepay.store.APCertStore;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public class DecryptionService {
         try {
             for (File fileName : merchantCertsList) {
                 byte[] pkcs12Data = Files.readAllBytes(fileName.toPath());
-                X509Certificate merchantCertificate = getCertificate(pkcs12Data, pksc12KeyPass);
+                X509Certificate merchantCertificate = getCertificate(pkcs12Data, pksc12KeyPass, fileName);
                 if (merchantCertificate != null) {
                     if (certificateMatchesKeyAndMerchantId(merchantCertificate, keyHash, merchantId)) {
                         return DecryptionTool.decrypt(paymentToken.getPaymentData().getHeader().getEphemeralPublicKey(),

@@ -1,5 +1,6 @@
 package com.rbkmoney.provider.applepay.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -19,6 +20,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.Enumeration;
 
+@Slf4j
 public class DecryptionTool {
     // Apple Pay uses an 0s for the IV
     private static final byte[] IV = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -76,15 +78,22 @@ public class DecryptionTool {
         return new String(plaintext, "ASCII");
     }
 
-    public static X509Certificate getCertificate(byte[] pkcs12Data, char[] pkcs12KeyPass) throws NoSuchProviderException, KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        KeyStore keystore = KeyStore.getInstance("PKCS12", "BC");
-        keystore.load(new ByteArrayInputStream(pkcs12Data), pkcs12KeyPass);
-        Enumeration<String> aliases = keystore.aliases();
-        String alias = null;
-        while (aliases.hasMoreElements()) {
-            alias = aliases.nextElement();
+    public static X509Certificate getCertificate(byte[] pkcs12Data, char[] pkcs12KeyPass, File filename) throws NoSuchProviderException, KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+        try {
+            KeyStore keystore = KeyStore.getInstance("PKCS12", "BC");
+            keystore.load(new ByteArrayInputStream(pkcs12Data), pkcs12KeyPass);
+            Enumeration<String> aliases = keystore.aliases();
+            String alias = null;
+            while (aliases.hasMoreElements()) {
+                alias = aliases.nextElement();
+            }
+            return (X509Certificate) keystore.getCertificate(alias);
+        } catch (IOException e) {
+            if (e.getMessage().equals("PKCS12 key store mac invalid - wrong password or corrupted file.")) {
+                log.info("Failed to get certificate from file: " + filename);
+                return null;
+            } else throw new IOException(e);
         }
-        return (X509Certificate) keystore.getCertificate(alias);
     }
 
     public static String getMerchantUID(X509Certificate merchantCertificate) {
