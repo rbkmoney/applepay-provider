@@ -9,11 +9,12 @@
         <groupId>com.rbkmoney</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.1.RELEASE</version>
+        <relativePath/>
     </parent>
 
     <groupId>com.rbkmoney.provider</groupId>
     <artifactId>applepay</artifactId>
-    <version>1.0.7-SNAPSHOT</version>
+    <version>1.0.8-SNAPSHOT</version>
     <name>adapter-applepay</name>
 
     <properties>
@@ -24,7 +25,7 @@
         <project.maintainer>Pavel Popov &lt;p.popov@rbkmoney.com&gt;</project.maintainer>
         <dockerfile.base.service.tag>c0d0900ec19c907d866f8360031a836049985110</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
-        <damsel.version>1.232-5e54b26</damsel.version>
+        <damsel.version>1.384-7dd9035</damsel.version>
         <shared.resources.version>0.3.6</shared.resources.version>
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
     </properties>
@@ -34,12 +35,7 @@
         <dependency>
             <groupId>com.rbkmoney.woody</groupId>
             <artifactId>woody-thrift</artifactId>
-            <version>1.1.15</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rbkmoney.logback</groupId>
-            <artifactId>nop-rolling</artifactId>
-            <version>1.0.1</version>
+            <version>1.1.16</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
