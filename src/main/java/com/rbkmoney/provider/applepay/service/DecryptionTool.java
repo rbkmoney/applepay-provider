@@ -102,9 +102,8 @@ public class DecryptionTool {
         for (String s : subjectArray) {
             String[] str = s.trim().split("=");
             String key = str[0];
-            String value = str[1];
             if (key.equals("UID")) {
-                return value;
+                return str[1];
             }
         }
         return null;
