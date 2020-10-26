@@ -93,8 +93,8 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcmail-jdk15</artifactId>
-            <version>1.46</version>
+            <artifactId>bcmail-jdk15on</artifactId>
+            <version>1.66</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

@@ -6,7 +6,7 @@ import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.KDFParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMParser;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -46,7 +46,7 @@ public class DecryptionTool {
     public static String decrypt(String ephemeralPublicKeyData, byte[] tokenData, byte[] merchantCerData, byte[] pkcs12KeyData, char[] pkcs12KeyPass) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, NoSuchProviderException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException {
         // read the ephemeral public key. It's a PEM file without header/footer -- add it back to make our lives easy
         String ephemeralPubKeyStr = "-----BEGIN PUBLIC KEY-----\n" + ephemeralPublicKeyData + "\n-----END PUBLIC KEY-----";
-        PEMReader pemReaderPublic = new PEMReader(new StringReader(ephemeralPubKeyStr));
+        PEMParser pemReaderPublic = new PEMParser(new StringReader(ephemeralPubKeyStr));
         ECPublicKey ephemeralPublicKey = (ECPublicKey) pemReaderPublic.readObject();
 
         // Apple assigns a merchant identifier and places it in an extension (OID 1.2.840.113635.100.6.32)
@@ -65,7 +65,7 @@ public class DecryptionTool {
     public static String decrypt(String ephemeralPublicKeyData, byte[] tokenData, byte[] pkcs12Data, X509Certificate merchantCertificate, char[] pkcs12KeyPass) throws IOException, CertificateException, KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException, NoSuchProviderException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException {
         // read the ephemeral public key. It's a PEM file without header/footer -- add it back to make our lives easy
         String ephemeralPubKeyStr = "-----BEGIN PUBLIC KEY-----\n" + ephemeralPublicKeyData + "\n-----END PUBLIC KEY-----";
-        PEMReader pemReaderPublic = new PEMReader(new StringReader(ephemeralPubKeyStr));
+        PEMParser pemReaderPublic = new PEMParser(new StringReader(ephemeralPubKeyStr));
         ECPublicKey ephemeralPublicKey = (ECPublicKey) pemReaderPublic.readObject();
 
         byte[] merchantIdentifier = extractMerchantIdentifier(merchantCertificate);
