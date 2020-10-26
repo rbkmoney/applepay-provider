@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -64,7 +62,7 @@ public class SessionRunnerTest {
             ResponseEntity<String> response = restTemplate.postForEntity(sessionUrl, request, String.class);
             assertEquals(HttpStatus.OK, response.getStatusCode());
 
-            System.out.println("Response:"+response.getBody());
+            System.out.println("Response:" + response.getBody());
         } catch (HttpClientErrorException e) {
             System.out.println(e.getResponseBodyAsString());
             throw e;

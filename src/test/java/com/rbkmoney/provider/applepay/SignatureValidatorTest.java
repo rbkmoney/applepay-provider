@@ -2,8 +2,6 @@ package com.rbkmoney.provider.applepay;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rbkmoney.provider.applepay.domain.Auth3DS;
 import com.rbkmoney.provider.applepay.domain.PaymentData;
 import com.rbkmoney.provider.applepay.domain.PaymentDataKeys;

@@ -3,7 +3,6 @@ package com.rbkmoney.provider.applepay.service;
 import com.rbkmoney.provider.applepay.domain.PaymentToken;
 import com.rbkmoney.provider.applepay.store.APCertStore;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.File;

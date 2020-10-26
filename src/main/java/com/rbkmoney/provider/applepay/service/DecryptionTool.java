@@ -2,11 +2,13 @@ package com.rbkmoney.provider.applepay.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.KDFParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -47,7 +49,9 @@ public class DecryptionTool {
         // read the ephemeral public key. It's a PEM file without header/footer -- add it back to make our lives easy
         String ephemeralPubKeyStr = "-----BEGIN PUBLIC KEY-----\n" + ephemeralPublicKeyData + "\n-----END PUBLIC KEY-----";
         PEMParser pemReaderPublic = new PEMParser(new StringReader(ephemeralPubKeyStr));
-        ECPublicKey ephemeralPublicKey = (ECPublicKey) pemReaderPublic.readObject();
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(pemReaderPublic.readObject());
+        ECPublicKey ephemeralPublicKey = (ECPublicKey) converter.getPublicKey(publicKeyInfo);
 
         // Apple assigns a merchant identifier and places it in an extension (OID 1.2.840.113635.100.6.32)
         final X509Certificate merchantCertificate = readDerEncodedX509Certificate(new ByteArrayInputStream(merchantCerData));
@@ -66,7 +70,9 @@ public class DecryptionTool {
         // read the ephemeral public key. It's a PEM file without header/footer -- add it back to make our lives easy
         String ephemeralPubKeyStr = "-----BEGIN PUBLIC KEY-----\n" + ephemeralPublicKeyData + "\n-----END PUBLIC KEY-----";
         PEMParser pemReaderPublic = new PEMParser(new StringReader(ephemeralPubKeyStr));
-        ECPublicKey ephemeralPublicKey = (ECPublicKey) pemReaderPublic.readObject();
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(pemReaderPublic.readObject());
+        ECPublicKey ephemeralPublicKey = (ECPublicKey) converter.getPublicKey(publicKeyInfo);
 
         byte[] merchantIdentifier = extractMerchantIdentifier(merchantCertificate);
 
