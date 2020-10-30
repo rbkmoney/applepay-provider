@@ -21,6 +21,7 @@ public class SessionService {
     private final int connTimeoutMs;
     private final int readTimeoutMs;
     private final int writeTimeoutMs;
+    private final DnsSelector dnsSelector;
     private final SSLProvider sslProvider = new SSLProvider();
     private final THTransportErrorMapper errorMapper = new THTransportErrorMapper();
 
@@ -58,6 +59,7 @@ public class SessionService {
                 .readTimeout(readTimeoutMs, TimeUnit.MILLISECONDS)
                 .addInterceptor(new HttpLoggingInterceptor())
                 .sslSocketFactory(sslProvider.getSSLForClient(identityCert, pass), sslProvider.getX509TrustManager())
+                .dns(dnsSelector)
                 .build();
     }
 

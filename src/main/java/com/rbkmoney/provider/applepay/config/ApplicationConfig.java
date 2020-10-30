@@ -3,6 +3,7 @@ package com.rbkmoney.provider.applepay.config;
 import com.rbkmoney.damsel.payment_tool_provider.PaymentToolProviderSrv;
 import com.rbkmoney.provider.applepay.iface.decrypt.ProviderHandler;
 import com.rbkmoney.provider.applepay.service.DecryptionService;
+import com.rbkmoney.provider.applepay.service.DnsSelector;
 import com.rbkmoney.provider.applepay.service.SessionService;
 import com.rbkmoney.provider.applepay.service.SignatureValidator;
 import com.rbkmoney.provider.applepay.store.APCertStore;
@@ -49,12 +50,18 @@ public class ApplicationConfig {
     }
 
     @Bean
+    public DnsSelector dnsSelector(@Value("${apple.dnsMode}") DnsSelector.Mode dnsMode) {
+        return new DnsSelector(dnsMode);
+    }
+
+    @Bean
     public SessionService sessionService(APCertStore certStore,
                                          @Value("${cert.identity.pass}") String identityPass,
                                          @Value("${apple.conn_timeout}") int connTimeoutMs,
                                          @Value("${apple.read_timeout}") int readTimeoutMs,
-                                         @Value("${apple.write_timeout}") int writeTimeoutMs) {
-        return new SessionService(certStore, identityPass.toCharArray(), connTimeoutMs, readTimeoutMs, writeTimeoutMs);
+                                         @Value("${apple.write_timeout}") int writeTimeoutMs,
+                                         DnsSelector dnsSelector) {
+        return new SessionService(certStore, identityPass.toCharArray(), connTimeoutMs, readTimeoutMs, writeTimeoutMs, dnsSelector);
     }
 
     @Bean

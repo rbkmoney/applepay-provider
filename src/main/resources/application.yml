@@ -21,6 +21,7 @@ apple:
   conn_timeout: 3000
   read_timeout: 3000
   write_timeout: 3000
+  dnsMode: IPV4_FIRST
 #cert:base:
 cert:
   identity:
