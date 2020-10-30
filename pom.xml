@@ -26,8 +26,7 @@
         <dockerfile.base.service.tag>57e26d8ee999d7b0b50248c22afc63e6f926d276</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
         <damsel.version>1.384-7dd9035</damsel.version>
-        <shared.resources.version>0.3.6</shared.resources.version>
-        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+        <shared.resources.version>0.3.8</shared.resources.version>
     </properties>
 
     <dependencies>
@@ -35,12 +34,12 @@
         <dependency>
             <groupId>com.rbkmoney.woody</groupId>
             <artifactId>woody-thrift</artifactId>
-            <version>1.1.16</version>
+            <version>1.1.22</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
             <artifactId>common</artifactId>
-            <version>0.6.9</version>
+            <version>0.6.11</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
