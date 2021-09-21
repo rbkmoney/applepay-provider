@@ -28,6 +28,7 @@
         <damsel.version>1.431-2f62a8c</damsel.version>
         <lombok.version>1.18.20</lombok.version>
         <shared.resources.version>0.3.8</shared.resources.version>
+        <java.version>16</java.version>
     </properties>
 
     <dependencies>
