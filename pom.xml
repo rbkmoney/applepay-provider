@@ -25,7 +25,8 @@
         <project.maintainer>Pavel Popov &lt;p.popov@rbkmoney.com&gt;</project.maintainer>
         <dockerfile.base.service.tag>57e26d8ee999d7b0b50248c22afc63e6f926d276</dockerfile.base.service.tag>
         <dockerfile.registry>${env.REGISTRY}</dockerfile.registry>
-        <damsel.version>1.384-7dd9035</damsel.version>
+        <damsel.version>1.431-2f62a8c</damsel.version>
+        <lombok.version>1.18.20</lombok.version>
         <shared.resources.version>0.3.8</shared.resources.version>
     </properties>
 
@@ -168,14 +169,14 @@
                     <exclude>**/*.p12</exclude>
                 </excludes>
             </resource>
-                <resource>
-                    <directory>src/main/resources</directory>
-                    <filtering>false</filtering>
-                    <includes>
-                        <include>**/*.cer</include>
-                        <include>**/*.p12</include>
-                    </includes>
-                </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*.cer</include>
+                    <include>**/*.p12</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>
@@ -228,6 +229,15 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
