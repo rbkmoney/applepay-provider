@@ -66,7 +66,7 @@ public class ApplicationConfig {
 
     @Bean
     public SignatureValidator signatureValidator(@Value("${cert.ca.path}") Resource resource, @Value("${apple.expiration_time}") Long expirationTime) throws IOException {
-        return new SignatureValidator(Files.readAllBytes(resource.getFile().toPath()), expirationTime);
+        return new SignatureValidator(resource.getInputStream().readAllBytes(), expirationTime);
     }
 
     @Bean
